@@ -148,7 +148,7 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       vaul-svelte:
-        specifier: workspace:*
+        specifier: workspace:@johly/vaul-svelte@*
         version: link:../../packages/vaul-svelte
     devDependencies:
       '@sveltejs/adapter-cloudflare':
