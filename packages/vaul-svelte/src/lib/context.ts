@@ -15,6 +15,7 @@ interface DrawerContextValue
 			handleOnly: boolean;
 			container: HTMLElement | null;
 			autoFocus: boolean;
+			nested: boolean;
 		}>,
 		WritableBoxedValues<{
 			keyboardIsOpen: boolean;

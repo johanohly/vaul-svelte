@@ -18,6 +18,8 @@
 		onpointerup = noop,
 		onpointerout = noop,
 		onpointermove = noop,
+		ontouchmove = noop,
+		ontouchend = noop,
 		children,
 		...restProps
 	}: WithChildren<WithoutChildrenOrChild<ContentProps>> = $props();
@@ -36,6 +38,8 @@
 		onpointerup: box.with(() => onpointerup ?? noop),
 		onOpenAutoFocus: box.with(() => onOpenAutoFocus),
 		onFocusOutside: box.with(() => onFocusOutside),
+		ontouchmove: box.with(() => ontouchmove ?? noop),
+		ontouchend: box.with(() => ontouchend ?? noop),
 	});
 
 	const snapPointsOffset = $state.snapshot(contentState.ctx.snapPointsOffset);

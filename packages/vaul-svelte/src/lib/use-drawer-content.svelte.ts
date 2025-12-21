@@ -97,6 +97,10 @@ export function useDrawerContent(opts: UseDrawerContentProps) {
 		opts.onpointerdown.current?.(e);
 		pointerStart = { x: e.pageX, y: e.pageY };
 		ctx.onPress(e);
+		// Prevent parent drawer from receiving the event
+		if (ctx.nested.current) {
+			e.stopPropagation();
+		}
 	}
 
 	function onOpenAutoFocus(e: Event) {
@@ -144,6 +148,10 @@ export function useDrawerContent(opts: UseDrawerContentProps) {
 		);
 		if (isAllowedToSwipe) {
 			ctx.onDrag(e);
+			// Prevent parent drawer from receiving the drag event
+			if (ctx.nested.current) {
+				e.stopPropagation();
+			}
 		} else if (
 			Math.abs(xPosition) > swipeStartThreshold ||
 			Math.abs(yPosition) > swipeStartThreshold
@@ -157,12 +165,20 @@ export function useDrawerContent(opts: UseDrawerContentProps) {
 		pointerStart = null;
 		wasBeyondThePoint = false;
 		ctx.onRelease(e);
+		// Prevent parent drawer from receiving the release event
+		if (ctx.nested.current) {
+			e.stopPropagation();
+		}
 	}
 
 	function onpointerout(e: PointerEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		opts.onpointerout.current?.(e);
 		if (e.pointerType === "touch") return;
 		handleOnPointerUp(lastKnownPointerEvent);
+		// Prevent parent drawer from receiving the event
+		if (ctx.nested.current) {
+			e.stopPropagation();
+		}
 	}
 
 	function oncontextmenu(e: PointerEvent & { currentTarget: EventTarget & HTMLDivElement }) {
@@ -199,12 +215,20 @@ export function useDrawerContent(opts: UseDrawerContentProps) {
 
 		if (isAllowedToSwipe) {
 			ctx.onDrag(syntheticEvent);
+			// Prevent parent drawer from receiving the touch drag event
+			if (ctx.nested.current) {
+				e.stopPropagation();
+			}
 		}
 	}
 
-	function ontouchend(_e: TouchEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+	function ontouchend(e: TouchEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		if (lastKnownPointerEvent) {
 			handleOnPointerUp(lastKnownPointerEvent);
+		}
+		// Prevent parent drawer from receiving the touch end event
+		if (ctx.nested.current) {
+			e.stopPropagation();
 		}
 	}
 
