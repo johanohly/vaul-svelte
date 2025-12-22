@@ -367,7 +367,18 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 
 			// visualViewport height may change due to some subtle changes to the keyboard. Checking if the height changed by 60 or more will make sure that they keyboard really changed its open state.
 			if (Math.abs(previousDiffFromInitial - diffFromInitial) > 60) {
+				const wasKeyboardOpen = keyboardIsOpen.current;
 				keyboardIsOpen.current = !keyboardIsOpen.current;
+
+				// Reset styles when keyboard closes
+				if (wasKeyboardOpen && !keyboardIsOpen.current) {
+					// Clear inline styles to allow natural sizing
+					drawerNode.style.removeProperty("height");
+					drawerNode.style.removeProperty("bottom");
+					previousDiffFromInitial = 0;
+					initialDrawerHeight = 0;
+					return;
+				}
 			}
 
 			if (
