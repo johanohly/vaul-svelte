@@ -66,6 +66,7 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 	let lastTimeDragPrevented: Date | null = null;
 	let isAllowedToDrag = false;
 	let nestedOpenChangeTimer: number | null = null;
+	let hasNestedOpen = false;
 	let pointerStart = 0;
 	let keyboardIsOpen = box(false);
 	let shouldAnimate = $state(!opts.open.current);
@@ -114,6 +115,11 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 	function onPress(event: PointerEvent) {
 		if (!opts.dismissible.current && !opts.snapPoints.current) return;
 		if (drawerNode && !drawerNode.contains(event.target as Node)) return;
+
+		const target = event.target as HTMLElement;
+		if (target.hasAttribute("data-vaul-no-drag") || target.closest("[data-vaul-no-drag]")) {
+			return;
+		}
 
 		drawerHeight = drawerNode?.getBoundingClientRect().height || 0;
 		drawerWidth = drawerNode?.getBoundingClientRect().width || 0;
@@ -293,7 +299,8 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 			);
 		}
 
-		if (wrapper && overlayNode && opts.shouldScaleBackground.current) {
+		// Only scale the background wrapper for non-nested drawers
+		if (wrapper && overlayNode && opts.shouldScaleBackground.current && !opts.nested.current) {
 			// Calculate percentageDragged as a fraction (0 to 1)
 			const scaleValue = Math.min(getScale() + percentageDragged * (1 - getScale()), 1);
 			const borderRadiusValue = 8 - percentageDragged * 8;
@@ -449,19 +456,23 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 		const wrapper = document.querySelector("[data-vaul-drawer-wrapper]");
 		const currentSwipeAmount = getTranslate(drawerNode, opts.direction.current);
 
-		set(drawerNode, {
-			transform: "translate3d(0, 0, 0)",
-			transition: `transform ${TRANSITIONS.DURATION}s cubic-bezier(${TRANSITIONS.EASE.join(",")})`,
-		});
+		// Don't reset transform if a nested drawer is open (it has its own scale applied)
+		if (!hasNestedOpen) {
+			set(drawerNode, {
+				transform: "translate3d(0, 0, 0)",
+				transition: `transform ${TRANSITIONS.DURATION}s cubic-bezier(${TRANSITIONS.EASE.join(",")})`,
+			});
+		}
 
 		set(overlayNode, {
 			transition: `opacity ${TRANSITIONS.DURATION}s cubic-bezier(${TRANSITIONS.EASE.join(",")})`,
 			opacity: "1",
 		});
 
-		// Don't reset background if swiped upwards
+		// Don't reset background if swiped upwards (only for non-nested drawers)
 		if (
 			opts.shouldScaleBackground.current &&
+			!opts.nested.current &&
 			currentSwipeAmount &&
 			currentSwipeAmount > 0 &&
 			opts.open.current
@@ -607,6 +618,7 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 	);
 
 	function onNestedOpenChange(o: boolean) {
+		hasNestedOpen = o;
 		const scale = o ? (window.innerWidth - NESTED_DISPLACEMENT) / window.innerWidth : 1;
 
 		const initialTranslate = o ? -NESTED_DISPLACEMENT : 0;

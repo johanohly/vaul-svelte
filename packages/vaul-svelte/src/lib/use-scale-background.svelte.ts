@@ -21,7 +21,8 @@ export function useScaleBackground() {
 			() => ctx.setBackgroundColorOnScale.current,
 		],
 		() => {
-			if (ctx.open.current && ctx.shouldScaleBackground.current) {
+			// Only scale background for non-nested drawers
+			if (ctx.open.current && ctx.shouldScaleBackground.current && !ctx.nested.current) {
 				if (timeoutId) clearTimeout(timeoutId);
 				const wrapper =
 					(document.querySelector("[data-vaul-drawer-wrapper]") as HTMLElement) ||

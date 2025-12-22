@@ -15,6 +15,11 @@
 	const rootState = DrawerContext.get();
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const rest = $derived(restProps) as any;
+
+	// Watch open state to handle programmatic changes (bind:open)
+	$effect(() => {
+		rootState.onNestedOpenChange(open);
+	});
 </script>
 
 <DrawerRoot
@@ -27,9 +32,6 @@
 		onDrag(e, p);
 	}}
 	onOpenChange={(o) => {
-		if (o) {
-			rootState.onNestedOpenChange(o);
-		}
 		onOpenChange(o);
 	}}
 	onRelease={rootState.onNestedRelease}
