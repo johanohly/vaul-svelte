@@ -1,16 +1,16 @@
 ![](static/og.jpg)
 
-<!-- automd:badges license name="vaul-svelte" color="green" github="huntabyte/vaul-svelte" -->
-
 [![npm version](https://flat.badgen.net/npm/v/vaul-svelte?color=green)](https://npmjs.com/package/vaul-svelte)
 [![npm downloads](https://flat.badgen.net/npm/dm/vaul-svelte?color=green)](https://npmjs.com/package/vaul-svelte)
 [![license](https://flat.badgen.net/github/license/huntabyte/vaul-svelte?color=green)](https://github.com/huntabyte/vaul-svelte/blob/main/LICENSE)
 
-<!-- /automd -->
-
 Vaul-Svelte is an unstyled drawer component for Svelte that can be used as a Dialog replacement on tablet and mobile devices. It uses [Bits' Dialog primitive](https://www.bits-ui.com/docs/components/dialog) under the hood and is inspired by [this tweet](https://twitter.com/devongovett/status/1674470185783402496).
 
-This is a port of [Vaul](https://github.com/emilkowalski/vaul) for React, which was created by [Emil Kowalski](https://twitter.com/emilkowalski_).
+Vaul-Svelte is a port of [Vaul](https://github.com/emilkowalski/vaul) for React, which was created by [Emil Kowalski](https://twitter.com/emilkowalski_).
+
+> This fork merges [this PR](https://github.com/huntabyte/vaul-svelte/pull/134) and adds the ability for the library to automatically detect whether a drawer is nested or not, without requiring the explicit usage of `<Drawer.NestedRoot>` and handles the nested drawer being outside the parent drawer in the DOM.
+> 
+> Released as [@johly/vaul-svelte](https://www.npmjs.com/package/@johly/vaul-svelte) on NPM.
 
 ## Usage
 
