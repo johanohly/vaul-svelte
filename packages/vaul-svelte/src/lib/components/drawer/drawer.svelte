@@ -5,12 +5,18 @@
 	import { noop } from "$lib/internal/noop.js";
 	import { CLOSE_THRESHOLD, SCROLL_LOCK_TIMEOUT } from "$lib/internal/constants.js";
 	import { useDrawerRoot } from "$lib/use-drawer-root.svelte.js";
+	import type { ParentDrawerState } from "$lib/types.js";
+	import {
+		registerDrawer,
+		unregisterDrawer,
+		getCurrentParentDrawer,
+	} from "$lib/drawer-registry.js";
 
 	let {
 		open = $bindable(false),
 		onOpenChange = noop,
-		onDrag = noop,
-		onRelease = noop,
+		onDrag: onDragProp = noop,
+		onRelease: onReleaseProp = noop,
 		snapPoints,
 		shouldScaleBackground = false,
 		setBackgroundColorOnScale = true,
@@ -37,6 +43,48 @@
 		...restProps
 	}: RootProps = $props();
 
+	// Track the auto-detected parent drawer
+	// If drawer starts open, try to auto-detect immediately
+	const initialParent = open && !nested ? getCurrentParentDrawer() : undefined;
+	let resolvedParentDrawer = $state<ParentDrawerState | undefined>(initialParent);
+
+	// Auto-detect parent when opening (for drawers that open after mount)
+	let wasOpen = open;
+	$effect.pre(() => {
+		// Detect parent on open transition (false -> true)
+		if (open && !wasOpen && !nested) {
+			resolvedParentDrawer = getCurrentParentDrawer();
+		}
+		wasOpen = open;
+	});
+
+	// When parentDrawer is provided or auto-detected, this drawer behaves as nested
+	const isNestedViaParent = $derived(!!resolvedParentDrawer);
+	const effectiveNested = $derived(nested || isNestedViaParent);
+
+	// Wrap onDrag to also notify parent drawer
+	function onDrag(event: PointerEvent, percentageDragged: number) {
+		onDragProp(event, percentageDragged);
+		if (resolvedParentDrawer) {
+			resolvedParentDrawer.onNestedDrag(event, percentageDragged);
+		}
+	}
+
+	// Wrap onRelease to also notify parent drawer
+	function onRelease(event: PointerEvent, isOpen: boolean) {
+		onReleaseProp(event, isOpen);
+		if (resolvedParentDrawer) {
+			resolvedParentDrawer.onNestedRelease(event, isOpen);
+		}
+	}
+
+	// Watch open state to notify parent drawer
+	$effect(() => {
+		if (resolvedParentDrawer) {
+			resolvedParentDrawer.onNestedOpenChange(open);
+		}
+	});
+
 	const rootState = useDrawerRoot({
 		open: box.with(
 			() => open,
@@ -49,7 +97,7 @@
 		scrollLockTimeout: box.with(() => scrollLockTimeout),
 		snapPoints: box.with(() => snapPoints),
 		fadeFromIndex: box.with(() => fadeFromIndex),
-		nested: box.with(() => nested),
+		nested: box.with(() => effectiveNested),
 		shouldScaleBackground: box.with(() => shouldScaleBackground),
 		activeSnapPoint: box.with(
 			() => activeSnapPoint,
@@ -76,6 +124,27 @@
 		disablePreventScroll: box.with(() => disablePreventScroll),
 		onOpenChange: box.with(() => onOpenChange),
 		onAnimationEnd: box.with(() => onAnimationEnd),
+	});
+
+	// Get stable reference to drawer state for registry
+	const stableDrawerState = rootState.parentDrawerState;
+
+	// Register/unregister with global drawer registry
+	$effect(() => {
+		if (open) {
+			registerDrawer(stableDrawerState);
+			return () => unregisterDrawer(stableDrawerState);
+		}
+	});
+
+	// Clear auto-detected parent after drawer closes (separate effect to avoid loops)
+	$effect(() => {
+		if (!open && resolvedParentDrawer) {
+			// Use queueMicrotask to avoid triggering other effects synchronously
+			queueMicrotask(() => {
+				resolvedParentDrawer = undefined;
+			});
+		}
 	});
 </script>
 

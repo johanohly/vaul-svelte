@@ -5,7 +5,7 @@ import {
 	type ReadableBoxedValues,
 	type WritableBoxedValues,
 } from "svelte-toolbelt";
-import type { DrawerDirection } from "./types.js";
+import type { DrawerDirection, ParentDrawerState } from "./types.js";
 import { useSnapPoints } from "./use-snap-points.svelte.js";
 import { isInput, usePreventScroll } from "./use-prevent-scroll.svelte.js";
 import { usePositionFixed } from "./use-position-fixed.svelte.js";
@@ -745,7 +745,7 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 		drawerNode = node;
 	}
 
-	return DrawerContext.set({
+	const contextValue = {
 		...opts,
 		keyboardIsOpen,
 		closeDrawer,
@@ -778,5 +778,20 @@ export function useDrawerRoot(opts: UseDrawerRootProps) {
 		},
 		restorePositionSetting,
 		handleOpenChange,
-	});
+		/**
+		 * State that can be passed to another drawer to establish a parent-child
+		 * relationship without component hierarchy (for global/portal drawers).
+		 */
+		get parentDrawerState(): ParentDrawerState {
+			return {
+				onNestedOpenChange,
+				onNestedDrag,
+				onNestedRelease,
+				direction: opts.direction.current,
+			};
+		},
+	};
+
+	DrawerContext.set(contextValue);
+	return contextValue;
 }

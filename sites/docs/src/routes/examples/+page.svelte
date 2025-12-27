@@ -1,5 +1,6 @@
 <script lang="ts">
 	import NestedDrawer from "./nested-drawer.svelte";
+	import AutoNestedDrawer from "./auto-nested-drawer.svelte";
 	import NonDraggableDrawer from "./non-draggable-drawer.svelte";
 	import ScrollableDrawer from "./scrollable-drawer.svelte";
 	import SnapPointDrawer from "./snap-point-drawer.svelte";
@@ -13,6 +14,9 @@
 		<h1 class="relative mb-4 text-2xl font-semibold">Usage Examples</h1>
 		<div class="mb-4">
 			<NestedDrawer />
+		</div>
+		<div class="mb-4">
+			<AutoNestedDrawer />
 		</div>
 		<div class="mb-4">
 			<ScrollableDrawer />

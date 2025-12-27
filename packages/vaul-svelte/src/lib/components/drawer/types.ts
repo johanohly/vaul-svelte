@@ -7,6 +7,7 @@ import type {
 	WithoutChildrenOrChild,
 } from "bits-ui";
 import type { WithChildren, Without } from "svelte-toolbelt";
+import type { ParentDrawerState } from "$lib/types.js";
 
 export type WithFadeFromProps = {
 	/**
@@ -35,6 +36,19 @@ export type BaseDrawerRootPropsWithoutHTML = WithChildren<{
 	activeSnapPoint?: number | string | null;
 	onActiveSnapPointChange?: (snapPoint: number | string | null) => void;
 	open?: boolean;
+	/**
+	 * Exposes the drawer's state that can be passed to another drawer's `parentDrawer`
+	 * prop to establish a parent-child relationship without component hierarchy.
+	 * Useful for global/portal confirmation drawers.
+	 */
+	drawerState?: ParentDrawerState;
+	/**
+	 * Pass another drawer's `drawerState` here to make this drawer behave as a nested
+	 * drawer of that parent, even when rendered outside the component hierarchy.
+	 * When provided, this drawer will automatically have `nested` behavior enabled
+	 * and will scale/animate the parent drawer appropriately.
+	 */
+	parentDrawer?: ParentDrawerState;
 	/**
 	 * Number between 0 and 1 that determines when the drawer should be closed.
 	 * Example: threshold of 0.5 would close the drawer if the user swiped for 50% of the height of the drawer or more.
