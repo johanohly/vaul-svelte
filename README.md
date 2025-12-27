@@ -8,7 +8,7 @@ Vaul-Svelte is an unstyled drawer component for Svelte that can be used as a Dia
 
 Vaul-Svelte is a port of [Vaul](https://github.com/emilkowalski/vaul) for React, which was created by [Emil Kowalski](https://twitter.com/emilkowalski_).
 
-> This fork merges [this PR](https://github.com/huntabyte/vaul-svelte/pull/134) and adds the ability for the library to automatically detect whether a drawer is nested or not, without requiring the explicit usage of `<Drawer.NestedRoot>` and handles the nested drawer being outside the parent drawer in the DOM.
+> [!NOTE] This fork merges [this PR](https://github.com/huntabyte/vaul-svelte/pull/134) and adds the ability for the library to automatically detect whether a drawer is nested or not, without requiring the explicit usage of `<Drawer.NestedRoot>` and handles the nested drawer being outside the parent drawer in the DOM.
 > 
 > Released as [@johly/vaul-svelte](https://www.npmjs.com/package/@johly/vaul-svelte) on NPM.
 
